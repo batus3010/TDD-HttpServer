@@ -71,18 +71,25 @@ func TestGETPlayers(t *testing.T) {
 	})
 }
 
-func TestScoreWins(t *testing.T) {
+func TestPostAccepted(t *testing.T) {
 	store := StubPlayerStore{
 		scores: map[string]int{},
 	}
 	server := &PlayerServer{store: &store}
-	//t.Run("returns accepted on POST", func(t *testing.T) {
-	//	request, _ := http.NewRequest(http.MethodPost, "/players/Pepper", nil)
-	//	response := httptest.NewRecorder()
-	//	server.ServeHTTP(response, request)
-	//
-	//	assertStatus(t, response.Code, http.StatusAccepted)
-	//})
+	t.Run("returns accepted on POST", func(t *testing.T) {
+		request, _ := http.NewRequest(http.MethodPost, "/players/Pepper", nil)
+		response := httptest.NewRecorder()
+		server.ServeHTTP(response, request)
+
+		assertStatus(t, response.Code, http.StatusAccepted)
+	})
+}
+
+func TestPostRecordWins(t *testing.T) {
+	store := StubPlayerStore{
+		scores: map[string]int{},
+	}
+	server := &PlayerServer{store: &store}
 	t.Run("it records wins when POST", func(t *testing.T) {
 		player := "Pepper"
 		request := newPostWinRequest("Pepper")
@@ -98,6 +105,19 @@ func TestScoreWins(t *testing.T) {
 		if store.winCalls[0] != player {
 			t.Errorf("did not store correct winner got %q want %q", store.winCalls[0], player)
 		}
+	})
+}
+
+func TestLeague(t *testing.T) {
+	store := StubPlayerStore{
+		scores: map[string]int{},
+	}
+	server := &PlayerServer{store: &store}
+	t.Run("it returns 200 on endpoint /league", func(t *testing.T) {
+		request, _ := http.NewRequest(http.MethodGet, "/league", nil)
+		response := httptest.NewRecorder()
+		server.ServeHTTP(response, request)
+		assertStatus(t, response.Code, http.StatusOK)
 	})
 }
 
