@@ -1,0 +1,11 @@
+// TODO 1.take some effort to prevent concurrency errors like these
+    fatal error: concurrent map read and map write
+
+// TODO 2.take this forward and pick a data store to persist the scores
+    Postgres?
+    Make PostgresPlayerStore implement PlayerStore
+    TDD the functionality so you're sure it works
+    Plug it into the integration test, check it's still ok
+    Finally plug it into main
+
+
