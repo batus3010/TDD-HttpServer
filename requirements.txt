@@ -1,0 +1,9 @@
+1. Create a web server to store how many games players have won.
+    1.1 GET /players/{name} should return a number indicating the total number of wins
+    1.2 POST /players/{name} should record a win for that name, incrementing for every subsequent POST
+
+TODO 2. have a new endpoint called /league which returns a list of all players stored.
+    returned as JSON.
+
+
+
