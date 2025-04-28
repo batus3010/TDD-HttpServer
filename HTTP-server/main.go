@@ -1,0 +1,16 @@
+package main
+
+import (
+	"log"
+	"net/http"
+)
+
+type InMemoryPlayerStore struct{}
+
+func (i *InMemoryPlayerStore) GetPlayerScore(player string) int {
+	return 123
+}
+func main() {
+	server := &PlayerServer{&InMemoryPlayerStore{}}
+	log.Fatal(http.ListenAndServe(":5000", server))
+}
