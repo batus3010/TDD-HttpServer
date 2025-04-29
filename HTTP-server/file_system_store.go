@@ -33,6 +33,8 @@ func (f *FileSystemPlayerStore) RecordWin(name string) {
 	for i, player := range league {
 		if player.Name == name {
 			league[i].Wins++
+		} else {
+			league = append(league, Player{name, 1})
 		}
 	}
 	f.database.Seek(0, io.SeekStart)
