@@ -1,5 +1,6 @@
 // TODO 1.take some effort to prevent concurrency errors like these
     fatal error: concurrent map read and map write
+    superfluous response.writeheader call
 
 // TODO 2.take this forward and pick a data store to persist the scores
     Postgres?
