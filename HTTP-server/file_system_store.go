@@ -40,8 +40,12 @@ func NewFileSystemPlayerStore(file *os.File) (*FileSystemPlayerStore, error) {
 	if err != nil {
 		return nil, fmt.Errorf("problem loading player store from file %s, %v", file.Name(), err)
 	}
+	// build the encoder and configure indentation
+	enc := json.NewEncoder(&tape{file})
+	enc.SetIndent("", "  ") // <-- prettify every Encode call
+
 	return &FileSystemPlayerStore{
-		database: json.NewEncoder(&tape{file}),
+		database: enc,
 		league:   league,
 	}, nil
 }

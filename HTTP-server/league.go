@@ -21,7 +21,7 @@ func NewLeague(rdr io.Reader) (League, error) {
 	var league []Player
 	err := json.NewDecoder(rdr).Decode(&league)
 	if err != nil {
-		err = fmt.Errorf("Error passing league: %v", err)
+		err = fmt.Errorf("error passing league: %v", err)
 	}
 	return league, err
 }

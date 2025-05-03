@@ -5,6 +5,7 @@ import (
 	"os"
 )
 
+// tape encapsulates the process of "when we write data we go from the beginning"
 type tape struct {
 	file *os.File
 }
