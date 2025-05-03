@@ -8,6 +8,20 @@ type StubPlayerStore struct {
 	league   League
 }
 
+func (s *StubPlayerStore) DeletePlayer(name string) {
+	// remove from scores map
+	delete(s.scores, name)
+
+	// filter out from league slice
+	filtered := make(League, 0, len(s.league))
+	for _, p := range s.league {
+		if p.Name != name {
+			filtered = append(filtered, p)
+		}
+	}
+	s.league = filtered
+}
+
 func (s *StubPlayerStore) GetPlayerScore(name string) int {
 	score := s.scores[name]
 	return score

@@ -58,7 +58,7 @@ func (f *FileSystemPlayerStore) GetLeague() League {
 }
 
 func (f *FileSystemPlayerStore) GetPlayerScore(name string) int {
-	player := f.league.Find(name)
+	player := f.league.FindPlayer(name)
 
 	if player != nil {
 		return player.Wins
@@ -68,11 +68,24 @@ func (f *FileSystemPlayerStore) GetPlayerScore(name string) int {
 }
 
 func (f *FileSystemPlayerStore) RecordWin(name string) {
-	player := f.league.Find(name)
+	player := f.league.FindPlayer(name)
 	if player != nil {
 		player.Wins++
 	} else {
 		f.league = append(f.league, Player{name, 1})
+	}
+	f.database.Encode(f.league)
+}
+
+func (f *FileSystemPlayerStore) DeletePlayer(name string) {
+	player := f.league.FindPlayer(name)
+	if player != nil {
+		for i, p := range f.league {
+			if p.Name == name {
+				f.league[i] = f.league[len(f.league)-1]
+				f.league = f.league[:len(f.league)-1]
+			}
+		}
 	}
 	f.database.Encode(f.league)
 }

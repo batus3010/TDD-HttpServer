@@ -60,6 +60,35 @@ func TestPostRecordWins(t *testing.T) {
 	})
 }
 
+func TestDeletePlayer(t *testing.T) {
+	store := StubPlayerStore{
+		scores: map[string]int{
+			"Pepper": 20,
+			"Floyd":  10,
+			"Batus":  5,
+		},
+	}
+	server := NewPlayerServer(&store)
+	t.Run("it returns 404 on non-existing player", func(t *testing.T) {
+		player := "Peter"
+		req, _ := http.NewRequest(http.MethodDelete, "/players/"+player, nil)
+		response := httptest.NewRecorder()
+		server.ServeHTTP(response, req)
+		assertStatus(t, response.Code, http.StatusNotFound)
+	})
+	t.Run("it returns 200 on existing player and delete them", func(t *testing.T) {
+		player := "Pepper"
+		req, _ := http.NewRequest(http.MethodDelete, "/players/"+player, nil)
+		response := httptest.NewRecorder()
+		server.ServeHTTP(response, req)
+		assertStatus(t, response.Code, http.StatusOK)
+		req, _ = http.NewRequest(http.MethodDelete, "/players/Pepper", nil)
+		response = httptest.NewRecorder()
+		server.ServeHTTP(response, req)
+		assertStatus(t, response.Code, http.StatusNotFound)
+	})
+}
+
 func TestLeague(t *testing.T) {
 	store := StubPlayerStore{
 		scores: map[string]int{},

@@ -13,6 +13,7 @@ type PlayerStore interface {
 	GetPlayerScore(name string) int
 	RecordWin(name string)
 	GetLeague() League
+	DeletePlayer(name string)
 }
 
 type PlayerServer struct {
@@ -49,6 +50,12 @@ func (p *PlayerServer) playersHandler(w http.ResponseWriter, r *http.Request) {
 		p.processWin(w, player)
 	case http.MethodGet:
 		p.showScore(w, player)
+	case http.MethodDelete:
+		if p.store.GetPlayerScore(player) != 0 {
+			p.store.DeletePlayer(player)
+			w.WriteHeader(http.StatusOK)
+		}
+		w.WriteHeader(http.StatusNotFound)
 	}
 }
 
