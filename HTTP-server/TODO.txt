@@ -1,8 +1,10 @@
-// TODO 1.take some effort to prevent concurrency errors like these
+// TODO 1. write test and implement /delete/{player} handler
+
+// TODO 2.take some effort to prevent concurrency errors like these
     fatal error: concurrent map read and map write
     superfluous response.writeheader call
 
-// TODO 2.take this forward and pick a data store to persist the scores
+// TODO 3.take this forward and pick a data store to persist the scores
     Postgres?
     Make PostgresPlayerStore implement PlayerStore
     TDD the functionality so you're sure it works

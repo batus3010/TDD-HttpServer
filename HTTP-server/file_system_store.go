@@ -78,13 +78,10 @@ func (f *FileSystemPlayerStore) RecordWin(name string) {
 }
 
 func (f *FileSystemPlayerStore) DeletePlayer(name string) {
-	player := f.league.FindPlayer(name)
-	if player != nil {
-		for i, p := range f.league {
-			if p.Name == name {
-				f.league[i] = f.league[len(f.league)-1]
-				f.league = f.league[:len(f.league)-1]
-			}
+	for i, p := range f.league {
+		if p.Name == name {
+			f.league[i] = f.league[len(f.league)-1]
+			f.league = f.league[:len(f.league)-1]
 		}
 	}
 	f.database.Encode(f.league)

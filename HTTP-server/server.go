@@ -51,12 +51,16 @@ func (p *PlayerServer) playersHandler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		p.showScore(w, player)
 	case http.MethodDelete:
-		if p.store.GetPlayerScore(player) != 0 {
-			p.store.DeletePlayer(player)
-			w.WriteHeader(http.StatusOK)
-		}
-		w.WriteHeader(http.StatusNotFound)
+		p.deletePlayer(w, player)
 	}
+}
+
+func (p *PlayerServer) deletePlayer(w http.ResponseWriter, name string) {
+	if p.store.GetPlayerScore(name) != 0 {
+		p.store.DeletePlayer(name)
+		w.WriteHeader(http.StatusOK)
+	}
+	w.WriteHeader(http.StatusNotFound)
 }
 
 func (p *PlayerServer) showScore(w http.ResponseWriter, player string) {
