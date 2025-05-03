@@ -43,20 +43,6 @@ func TestGETPlayers(t *testing.T) {
 	})
 }
 
-func TestPostAccepted(t *testing.T) {
-	store := StubPlayerStore{
-		scores: map[string]int{},
-	}
-	server := NewPlayerServer(&store)
-	t.Run("returns accepted on POST", func(t *testing.T) {
-		request, _ := http.NewRequest(http.MethodPost, "/players/Pepper", nil)
-		response := httptest.NewRecorder()
-		server.ServeHTTP(response, request)
-
-		assertStatus(t, response.Code, http.StatusAccepted)
-	})
-}
-
 func TestPostRecordWins(t *testing.T) {
 	store := StubPlayerStore{
 		scores: map[string]int{},
@@ -69,7 +55,7 @@ func TestPostRecordWins(t *testing.T) {
 
 		server.ServeHTTP(response, request)
 
-		assertStatus(t, response.Code, http.StatusAccepted)
+		assertStatus(t, response.Code, http.StatusAccepted) // return 202 Accepted on POST
 		AssertPlayerWin(t, &store, player)
 	})
 }
