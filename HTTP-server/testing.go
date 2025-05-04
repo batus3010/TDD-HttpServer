@@ -2,12 +2,18 @@ package poker
 
 import (
 	"testing"
+	"time"
 )
 
 type StubPlayerStore struct {
 	scores   map[string]int
 	winCalls []string
 	league   League
+}
+
+type ScheduledAlert struct {
+	At     time.Duration
+	Amount int
 }
 
 func (s *StubPlayerStore) DeletePlayer(name string) {
