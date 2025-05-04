@@ -12,9 +12,11 @@ import (
 type GameSpy struct {
 	StartedWith  int
 	FinishedWith string
+	StartCalled  bool
 }
 
 func (g *GameSpy) Start(numberOfPlayers int) {
+	g.StartCalled = true
 	g.StartedWith = numberOfPlayers
 }
 
@@ -66,6 +68,18 @@ func TestCLI(t *testing.T) {
 }
 
 func TestGame_Start(t *testing.T) {
+	t.Run("prints an error when a non numeric value is entered and does not start the game", func(t *testing.T) {
+		stdOut := &bytes.Buffer{}
+		in := strings.NewReader("Junk\n")
+		game := &GameSpy{}
+
+		cli := poker.NewCLI(in, stdOut, game)
+		cli.PlayPoker()
+
+		if game.StartCalled {
+			t.Errorf("game should not have started")
+		}
+	})
 	t.Run("schedule alerts on game on start for 5 players", func(t *testing.T) {
 		blindAlerter := &SpyBlindAlerter{}
 		game := poker.NewPokerGame(blindAlerter, dummyPlayerStore)
@@ -124,12 +138,16 @@ func TestGame_Start(t *testing.T) {
 }
 
 func TestGame_Finish(t *testing.T) {
-	store := &poker.StubPlayerStore{}
-	game := poker.NewPokerGame(dummyBlindAlerter, store)
-	winner := "Ruth"
-
-	game.Finish(winner)
-	poker.AssertPlayerWin(t, store, winner)
+	t.Run("finishes game with 'Chris' as winner", func(t *testing.T) {
+		in := strings.NewReader("1\nChris wins\n")
+		game := &GameSpy{}
+		cli := poker.NewCLI(in, dummyStdOut, game)
+		cli.PlayPoker()
+		winner := "Chris"
+		if game.FinishedWith != winner {
+			t.Errorf("expected finish called with 'Chris' but got %q", game.FinishedWith)
+		}
+	})
 }
 
 func assertScheduledAlert(t *testing.T, got, want scheduledAlert) {
