@@ -2,6 +2,11 @@ package poker
 
 import "time"
 
+type Game interface {
+	Start(numberOfPlayers int)
+	Finish(winner string)
+}
+
 type PokerGame struct {
 	alerter BlindAlerter
 	store   PlayerStore
