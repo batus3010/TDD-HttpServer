@@ -1,6 +1,8 @@
 package poker
 
-import "testing"
+import (
+	"testing"
+)
 
 type StubPlayerStore struct {
 	scores   map[string]int

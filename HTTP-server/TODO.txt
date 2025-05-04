@@ -1,5 +1,3 @@
-// TODO 1. write test and implement /delete/{player} handler
-
 // TODO 2.take some effort to prevent concurrency errors like these
     fatal error: concurrent map read and map write
     superfluous response.writeheader call
@@ -11,5 +9,14 @@
     Plug it into the integration test, check it's still ok
     Finally plug it into main
 
-
-//
+// TODO 4 Expand the functionality of the commandline app by implementing a poker game
+    Given rules:
+    - at certain time intervals all the players need to be informed of a steadily increasing "blind" value.
+    - application will help keep track of when the blind should go up, and how much it should be.
+    - When it starts it asks how many players are playing.
+    This determines the amount of time there is before the "blind" bet goes up
+        + There is a base amount of time of 5 minutes.
+        + For every player, 1 minute is added.
+        + e.g 6 players equals 11 minutes for the blind
+    - After the blind time expires the game should alert the players the new amount the blind bet is.
+    - The blind starts at 100 chips, then 200, 400, 600, 1000, 2000 and continue to double until the game ends 
