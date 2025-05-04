@@ -1,1 +1,3 @@
 /HTTP-server/game.db.json
+/HTTP-server/cmd/cli/game.db.json
+/HTTP-server/cmd/webserver/game.db.json
