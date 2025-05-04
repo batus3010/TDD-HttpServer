@@ -79,6 +79,12 @@ func TestGame_Start(t *testing.T) {
 		if game.StartCalled {
 			t.Errorf("game should not have started")
 		}
+
+		gotPrompt := stdOut.String()
+		wantPrompt := poker.StartGamePlayerPrompt + poker.BadPlayerInputErrMsg
+		if gotPrompt != wantPrompt {
+			t.Errorf("got %q, want %q", gotPrompt, wantPrompt)
+		}
 	})
 	t.Run("schedule alerts on game on start for 5 players", func(t *testing.T) {
 		blindAlerter := &SpyBlindAlerter{}
