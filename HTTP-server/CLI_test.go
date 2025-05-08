@@ -10,9 +10,9 @@ import (
 )
 
 type GameSpy struct {
+	StartCalled  bool
 	StartedWith  int
 	FinishedWith string
-	StartCalled  bool
 }
 
 func (g *GameSpy) Start(numberOfPlayers int) {

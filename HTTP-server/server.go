@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/gorilla/websocket"
 	"html/template"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -65,7 +66,10 @@ func NewPlayerServer(store PlayerStore) (*PlayerServer, error) {
 
 func (p *PlayerServer) leagueHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", JsonContentType)
-	json.NewEncoder(w).Encode(p.store.GetLeague())
+	err := json.NewEncoder(w).Encode(p.store.GetLeague())
+	if err != nil {
+		log.Printf("league handler encountered an error: %v", err)
+	}
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -82,7 +86,10 @@ func (p *PlayerServer) playersHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *PlayerServer) game(w http.ResponseWriter, r *http.Request) {
-	p.template.Execute(w, nil)
+	err := p.template.Execute(w, nil)
+	if err != nil {
+		log.Printf("template encountered an error: %v", err)
+	}
 }
 
 func (p *PlayerServer) webSocket(w http.ResponseWriter, r *http.Request) {
