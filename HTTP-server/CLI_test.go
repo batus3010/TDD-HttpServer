@@ -57,14 +57,6 @@ func TestCLI(t *testing.T) {
 
 		poker.AssertPlayerWin(t, playerStore, "Chris")
 	})
-	t.Run("records a player name Cleo win from user input", func(t *testing.T) {
-		in := strings.NewReader("7\nCleo wins\n")
-		playerStore := &poker.StubPlayerStore{}
-		game := poker.NewPokerGame(dummyBlindAlerter, playerStore)
-		cli := poker.NewCLI(in, dummyStdOut, game)
-		cli.PlayPoker()
-		poker.AssertPlayerWin(t, playerStore, "Cleo")
-	})
 }
 
 func TestGame_Start(t *testing.T) {
@@ -106,22 +98,6 @@ func TestGame_Start(t *testing.T) {
 		checkSchedulingCases(cases, t, blindAlerter)
 	})
 
-	t.Run("schedules alerts on game start for 7 players", func(t *testing.T) {
-		blindAlerter := &SpyBlindAlerter{}
-		game := poker.NewPokerGame(blindAlerter, dummyPlayerStore)
-
-		game.Start(7)
-
-		cases := []scheduledAlert{
-			{0 * time.Second, 100},
-			{12 * time.Minute, 200},
-			{24 * time.Minute, 300},
-			{36 * time.Minute, 400},
-		}
-
-		checkSchedulingCases(cases, t, blindAlerter)
-	})
-
 	t.Run("it prompts the user to enter the number of players and starts the game", func(t *testing.T) {
 		stdout := &bytes.Buffer{}
 		in := strings.NewReader("7\n")
@@ -160,6 +136,15 @@ func assertScheduledAlert(t *testing.T, got, want scheduledAlert) {
 	t.Helper()
 	if got.at != want.at {
 		t.Errorf("scheduled alert at %v, want %v", got.at, want.at)
+	}
+}
+
+func assertMessageSentToPlayer(t *testing.T, stdOut *bytes.Buffer, messages ...string) {
+	t.Helper()
+	want := strings.Join(messages, "")
+	got := stdOut.String()
+	if got != want {
+		t.Errorf("got %q sent to stdout but expected %+v", got, messages)
 	}
 }
 

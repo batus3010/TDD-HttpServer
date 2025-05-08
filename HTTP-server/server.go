@@ -32,6 +32,7 @@ func NewPlayerServer(store PlayerStore) *PlayerServer {
 	router := http.NewServeMux()
 	router.Handle("/league", http.HandlerFunc(p.leagueHandler))
 	router.Handle("/players/", http.HandlerFunc(p.playersHandler))
+	router.Handle("/game", http.HandlerFunc(p.game))
 	p.Handler = router
 
 	return p
@@ -53,6 +54,10 @@ func (p *PlayerServer) playersHandler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodDelete:
 		p.deletePlayer(w, player)
 	}
+}
+
+func (p *PlayerServer) game(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
 }
 
 func (p *PlayerServer) deletePlayer(w http.ResponseWriter, name string) {
