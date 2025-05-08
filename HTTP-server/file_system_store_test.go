@@ -1,6 +1,7 @@
-package poker
+package poker_test
 
 import (
+	poker "HTTP-server"
 	"os"
 	"testing"
 )
@@ -12,13 +13,13 @@ func TestFileSystemStore(t *testing.T) {
 		{"Name": "Chris", "Wins": 33}]`)
 		defer cleanDatabase()
 
-		store, err := NewFileSystemPlayerStore(database)
+		store, err := poker.NewFileSystemPlayerStore(database)
 
 		assertNoError(t, err)
 
 		got := store.GetLeague()
 
-		want := League{
+		want := poker.League{
 			{"Chris", 33},
 			{"Cleo", 10},
 		}
@@ -35,7 +36,7 @@ func TestFileSystemStore(t *testing.T) {
 		{"Name": "Cleo", "Wins": 10},
 		{"Name": "Chris", "Wins": 33}]`)
 		defer cleanDatabase()
-		store, err := NewFileSystemPlayerStore(database)
+		store, err := poker.NewFileSystemPlayerStore(database)
 		assertNoError(t, err)
 		got := store.GetPlayerScore("Chris")
 		want := 33
@@ -46,7 +47,7 @@ func TestFileSystemStore(t *testing.T) {
 		{"Name": "Cleo", "Wins": 10},
 		{"Name": "Chris", "Wins": 33}]`)
 		defer cleanDatabase()
-		store, err := NewFileSystemPlayerStore(database)
+		store, err := poker.NewFileSystemPlayerStore(database)
 		assertNoError(t, err)
 		store.RecordWin("Chris")
 		got := store.GetPlayerScore("Chris")
@@ -58,17 +59,17 @@ func TestFileSystemStore(t *testing.T) {
 		{"Name": "Cleo", "Wins": 10},
 		{"Name": "Chris", "Wins": 33}]`)
 		defer cleanDatabase()
-		store, err := NewFileSystemPlayerStore(database)
+		store, err := poker.NewFileSystemPlayerStore(database)
 		assertNoError(t, err)
 		store.RecordWin("Pepper")
 		got := store.GetPlayerScore("Pepper")
 		want := 1
 		assertScoreEquals(t, got, want)
 	})
-	t.Run("works with an empty file", func(t *testing.T) {
+	t.Run("works with an empty File", func(t *testing.T) {
 		database, cleanDatabase := createTempFile(t, "")
 		defer cleanDatabase()
-		_, err := NewFileSystemPlayerStore(database)
+		_, err := poker.NewFileSystemPlayerStore(database)
 		assertNoError(t, err)
 	})
 }
@@ -77,7 +78,7 @@ func createTempFile(t testing.TB, initialData string) (*os.File, func()) {
 	t.Helper()
 	tmpfile, err := os.CreateTemp("", "db")
 	if err != nil {
-		t.Fatalf("error creating temp file: %v", err)
+		t.Fatalf("error creating temp File: %v", err)
 	}
 	tmpfile.Write([]byte(initialData))
 	removeFile := func() {
