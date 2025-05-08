@@ -6,7 +6,7 @@ import (
 )
 
 func TestFileSystemStore(t *testing.T) {
-	t.Run("get league from a reader and it's sorted", func(t *testing.T) {
+	t.Run("get League from a reader and it's sorted", func(t *testing.T) {
 		database, cleanDatabase := createTempFile(t, `[
 		{"Name": "Cleo", "Wins": 10},
 		{"Name": "Chris", "Wins": 33}]`)

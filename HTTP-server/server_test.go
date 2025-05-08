@@ -14,7 +14,7 @@ import (
 
 func TestGETPlayers(t *testing.T) {
 	store := StubPlayerStore{
-		scores: map[string]int{
+		Scores: map[string]int{
 			"Pepper": 20,
 			"Floyd":  10,
 		},
@@ -48,7 +48,7 @@ func TestGETPlayers(t *testing.T) {
 
 func TestPostRecordWins(t *testing.T) {
 	store := StubPlayerStore{
-		scores: map[string]int{},
+		Scores: map[string]int{},
 	}
 	server := mustMakePlayerServer(t, &store)
 	t.Run("it records wins when POST", func(t *testing.T) {
@@ -65,7 +65,7 @@ func TestPostRecordWins(t *testing.T) {
 
 func TestDeletePlayer(t *testing.T) {
 	store := StubPlayerStore{
-		scores: map[string]int{
+		Scores: map[string]int{
 			"Pepper": 20,
 			"Floyd":  10,
 			"Batus":  5,
@@ -94,17 +94,17 @@ func TestDeletePlayer(t *testing.T) {
 
 func TestLeague(t *testing.T) {
 	store := StubPlayerStore{
-		scores: map[string]int{},
+		Scores: map[string]int{},
 	}
 	server := mustMakePlayerServer(t, &store)
-	t.Run("it returns 200 on endpoint /league", func(t *testing.T) {
+	t.Run("it returns 200 on endpoint /League", func(t *testing.T) {
 		request, _ := http.NewRequest(http.MethodGet, "/league", nil)
 		response := httptest.NewRecorder()
 		server.ServeHTTP(response, request)
 		assertStatus(t, response.Code, http.StatusOK)
 	})
 
-	t.Run("it returns the league table as JSON", func(t *testing.T) {
+	t.Run("it returns the League table as JSON", func(t *testing.T) {
 		wantedLeague := []Player{
 			{"Cleo", 32},
 			{"Chris", 20},
@@ -162,7 +162,7 @@ func assertLeague(t testing.TB, got, want []Player) {
 
 func getLeagueFromResponse(t testing.TB, body io.Reader) (league []Player) {
 	t.Helper()
-	//err := json.NewDecoder(body).Decode(&league)
+	//err := json.NewDecoder(body).Decode(&League)
 	league, err := NewLeague(body)
 	if err != nil {
 		t.Fatalf("Unable to parse response from server %q into slice of Player, '%v'", body, err)
