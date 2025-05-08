@@ -2,11 +2,14 @@ package poker
 
 import (
 	"fmt"
+	"github.com/gorilla/websocket"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"strings"
 	"testing"
+	"time"
 )
 
 func TestGETPlayers(t *testing.T) {
@@ -131,7 +134,7 @@ func TestLeague(t *testing.T) {
 	})
 }
 
-func TestGame(t *testing.T) {
+func TestWebGame(t *testing.T) {
 	t.Run("GET /game returns status 200", func(t *testing.T) {
 		server := NewPlayerServer(&StubPlayerStore{})
 		request := newGameRequest()
@@ -140,6 +143,31 @@ func TestGame(t *testing.T) {
 		server.ServeHTTP(response, request)
 		assertStatus(t, response.Code, http.StatusOK)
 	})
+	t.Run("message sent from websocket is the winner of the game", func(t *testing.T) {
+		store := &StubPlayerStore{}
+		winner := "Cleo"
+		server := httptest.NewServer(NewPlayerServer(store))
+		defer server.Close()
+
+		wsURL := "ws" + strings.TrimPrefix(server.URL, "http") + "/ws"
+
+		ws, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
+		if err != nil {
+			t.Fatalf("could not open a ws connection on %s %v", server.URL, err)
+		}
+		defer func(ws *websocket.Conn) {
+			err := ws.Close()
+			if err != nil {
+				t.Fatalf("could not close websocket connection on %s %v", server.URL, err)
+			}
+		}(ws)
+		if err := ws.WriteMessage(websocket.TextMessage, []byte(winner)); err != nil {
+			t.Fatalf("could not send message to ws %v", err)
+		}
+		time.Sleep(10 * time.Millisecond)
+		AssertPlayerWin(t, store, winner)
+	})
+
 }
 
 func newGameRequest() *http.Request {
