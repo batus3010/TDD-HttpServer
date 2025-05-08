@@ -19,7 +19,7 @@ func TestGETPlayers(t *testing.T) {
 			"Floyd":  10,
 		},
 	}
-	server, _ := NewPlayerServer(&store)
+	server := mustMakePlayerServer(t, &store)
 	t.Run("GET return Pepper's score", func(t *testing.T) {
 		request := newGetScoreRequest("Pepper")
 		response := httptest.NewRecorder()
@@ -50,7 +50,7 @@ func TestPostRecordWins(t *testing.T) {
 	store := StubPlayerStore{
 		scores: map[string]int{},
 	}
-	server, _ := NewPlayerServer(&store)
+	server := mustMakePlayerServer(t, &store)
 	t.Run("it records wins when POST", func(t *testing.T) {
 		player := "Pepper"
 		request := newPostWinRequest("Pepper")
@@ -71,7 +71,7 @@ func TestDeletePlayer(t *testing.T) {
 			"Batus":  5,
 		},
 	}
-	server, _ := NewPlayerServer(&store)
+	server := mustMakePlayerServer(t, &store)
 	t.Run("it returns 404 on non-existing player", func(t *testing.T) {
 		player := "Peter"
 		req, _ := http.NewRequest(http.MethodDelete, "/players/"+player, nil)
@@ -96,7 +96,7 @@ func TestLeague(t *testing.T) {
 	store := StubPlayerStore{
 		scores: map[string]int{},
 	}
-	server, _ := NewPlayerServer(&store)
+	server := mustMakePlayerServer(t, &store)
 	t.Run("it returns 200 on endpoint /league", func(t *testing.T) {
 		request, _ := http.NewRequest(http.MethodGet, "/league", nil)
 		response := httptest.NewRecorder()
@@ -123,7 +123,7 @@ func TestLeague(t *testing.T) {
 			{"Tits", 14},
 		}
 		store := StubPlayerStore{nil, nil, wantedLeague}
-		server, _ := NewPlayerServer(&store)
+		server := mustMakePlayerServer(t, &store)
 		request := newLeagueRequest()
 		response := httptest.NewRecorder()
 		server.ServeHTTP(response, request)
@@ -136,7 +136,7 @@ func TestLeague(t *testing.T) {
 
 func TestWebGame(t *testing.T) {
 	t.Run("GET /game returns status 200", func(t *testing.T) {
-		server, _ := NewPlayerServer(&StubPlayerStore{})
+		server := mustMakePlayerServer(t, &StubPlayerStore{})
 		request := newGameRequest()
 		response := httptest.NewRecorder()
 
@@ -146,8 +146,7 @@ func TestWebGame(t *testing.T) {
 	t.Run("message sent from websocket is the winner of the game", func(t *testing.T) {
 		store := &StubPlayerStore{}
 		winner := "Cleo"
-		playerServer, _ := NewPlayerServer(store)
-		server := httptest.NewServer(playerServer)
+		server := httptest.NewServer(mustMakePlayerServer(t, store))
 		defer server.Close()
 
 		wsURL := "ws" + strings.TrimPrefix(server.URL, "http") + "/ws"
@@ -227,4 +226,12 @@ func assertContentType(t testing.TB, response *httptest.ResponseRecorder, want s
 	if response.Result().Header.Get("content-type") != want {
 		t.Errorf("response did not have content-type of %s, got %v", want, response.Result().Header)
 	}
+}
+
+func mustMakePlayerServer(t *testing.T, store PlayerStore) *PlayerServer {
+	server, err := NewPlayerServer(store)
+	if err != nil {
+		t.Fatalf("could not create player server: %v", err)
+	}
+	return server
 }
