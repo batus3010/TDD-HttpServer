@@ -104,18 +104,6 @@ func TestLeague(t *testing.T) {
 		assertStatus(t, response.Code, http.StatusOK)
 	})
 
-	//t.Run("it returns list of players", func(t *testing.T) {
-	//	request, _ := http.NewRequest(http.MethodGet, "/league", nil)
-	//	response := httptest.NewRecorder()
-	//	server.ServeHTTP(response, request)
-	//
-	//	var got []Player
-	//	err := json.NewDecoder(response.Body).Decode(&got)
-	//	if err != nil {
-	//		t.Fatalf("Unable to parse response from server %q into slice of Player, '%v'", response.Body, err)
-	//	}
-	//})
-
 	t.Run("it returns the league table as JSON", func(t *testing.T) {
 		wantedLeague := []Player{
 			{"Cleo", 32},
@@ -151,28 +139,18 @@ func TestWebGame(t *testing.T) {
 
 		wsURL := "ws" + strings.TrimPrefix(server.URL, "http") + "/ws"
 
-		ws, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
-		if err != nil {
-			t.Fatalf("could not open a ws connection on %s %v", server.URL, err)
-		}
+		ws := mustDialWS(t, wsURL)
 		defer func(ws *websocket.Conn) {
 			err := ws.Close()
 			if err != nil {
 				t.Fatalf("could not close websocket connection on %s %v", server.URL, err)
 			}
 		}(ws)
-		if err := ws.WriteMessage(websocket.TextMessage, []byte(winner)); err != nil {
-			t.Fatalf("could not send message to ws %v", err)
-		}
+		writeWSMessage(t, ws, winner)
 		time.Sleep(10 * time.Millisecond)
 		AssertPlayerWin(t, store, winner)
 	})
 
-}
-
-func newGameRequest() *http.Request {
-	req, _ := http.NewRequest(http.MethodGet, "/game", nil)
-	return req
 }
 
 func assertLeague(t testing.TB, got, want []Player) {
@@ -197,13 +175,6 @@ func newLeagueRequest() *http.Request {
 	return req
 }
 
-func assertStatus(t testing.TB, got, want int) {
-	t.Helper()
-	if got != want {
-		t.Errorf("did not get correct status, got %d, want %d", got, want)
-	}
-}
-
 func newPostWinRequest(name string) *http.Request {
 	req, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("/players/%s", name), nil)
 	return req
@@ -212,6 +183,18 @@ func newPostWinRequest(name string) *http.Request {
 func newGetScoreRequest(name string) *http.Request {
 	req, _ := http.NewRequest(http.MethodGet, "/players/"+name, nil)
 	return req
+}
+
+func newGameRequest() *http.Request {
+	req, _ := http.NewRequest(http.MethodGet, "/game", nil)
+	return req
+}
+
+func assertStatus(t testing.TB, got, want int) {
+	t.Helper()
+	if got != want {
+		t.Errorf("did not get correct status, got %d, want %d", got, want)
+	}
 }
 
 func assertResponseBody(t testing.TB, got, want string) {
@@ -234,4 +217,21 @@ func mustMakePlayerServer(t *testing.T, store PlayerStore) *PlayerServer {
 		t.Fatalf("could not create player server: %v", err)
 	}
 	return server
+}
+
+func mustDialWS(t *testing.T, url string) *websocket.Conn {
+	ws, _, err := websocket.DefaultDialer.Dial(url, nil)
+
+	if err != nil {
+		t.Fatalf("could not open a ws connection on %s %v", url, err)
+	}
+
+	return ws
+}
+
+func writeWSMessage(t testing.TB, conn *websocket.Conn, message string) {
+	t.Helper()
+	if err := conn.WriteMessage(websocket.TextMessage, []byte(message)); err != nil {
+		t.Fatalf("could not send message over ws connection %v", err)
+	}
 }
