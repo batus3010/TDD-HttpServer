@@ -35,6 +35,11 @@ var (
 	postTemplates embed.FS
 )
 
+var wsUpgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+}
+
 func NewPlayerServer(store PlayerStore) *PlayerServer {
 	p := new(PlayerServer)
 	p.store = store
@@ -80,13 +85,9 @@ func (p *PlayerServer) game(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *PlayerServer) webSocket(w http.ResponseWriter, r *http.Request) {
-	upgrader := websocket.Upgrader{
-		ReadBufferSize:  1024,
-		WriteBufferSize: 1024,
-	}
-	conn, _ := upgrader.Upgrade(w, r, nil)
-	_, winnerMsg, _ := conn.ReadMessage()
-	p.store.RecordWin(string(winnerMsg))
+	conn, _ := wsUpgrader.Upgrade(w, r, nil)
+	_, winnerMessage, _ := conn.ReadMessage()
+	p.store.RecordWin(string(winnerMessage))
 }
 
 func (p *PlayerServer) deletePlayer(w http.ResponseWriter, name string) {
